@@ -1,0 +1,752 @@
+/////////////////////////////////
+Two ways to interact with ansible are adhoc commands and playbooks
+
+
+Ansible Installation & Configurations:
+
+Launch 3 EC2 Instances... 1 for Ansible Controller & 2 as Nodes
+
+SSH connections :::
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#Login to Ansible Node1 & Node2. Perform below activities:
+
+#Add User in Ansible Nodes : 
+
+useradd -m -d /home/ansibleadmin ansibleadmin
+
+#useradd ansibleadmin
+
+passwd ansibleadmin
+
+#Enter New Password:
+#Confirm Password:
+
+#Goto:
+
+vi /etc/ssh/sshd_config
+
+#Enable Password Authentication to Yes and save the file
+#Execute Below command to update the changes.
+
+service sshd reload
+
+#As a root user edit below file:
+
+$ visudo
+
+#add the below mentioned line in the file and save it.
+ 
+#devopsadmin ALL=(ALL) NOPASSWD: ALL
+
+su - ansibleadmin
+
+ls -a 
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+#Login to Ansible Controller:
+
+#Install epel Package :
+#Install Ansible 
+
+amazon-linux-extras install epel -y
+amazon-linux-extras install ansible2 -y
+
+#go to /etc/ansible
+
+#host - inventory file
+#config
+#roles 
+
+#Add User in Ansible Controller : 
+
+
+useradd -m -d /home/devopsadmin devopsadmin
+
+#useradd devopsadmin
+
+
+chown -R devopsadmin:devopsadmin /etc/ansible
+
+su - devopsadmin	
+ssh-keygen
+
+ssh-copy-id ansibleadmin@172.31.2.234
+ssh-copy-id ansibleadmin@172.31.14.213
+
+ssh ansibleadmin@172.31.2.234
+ssh ansibleadmin@172.31.14.213
+
+###update vi etc/ansible/host
+
+[testnodes]
+samplenode1 ansible_ssh_host=172.31.2.234 ansible_ssh_user=ansibleadmin
+samplenode2 ansible_ssh_host=172.31.14.213 ansible_ssh_user=ansibleadmin
+
+#**************************************************************************************************************************
+#hosts file is the default Inventory file for ansible 
+#**************************************************************************************************************************
+#Access thru Ansible Controller :
+#**************************************************************************************************************************
+
+ansible <hosts_name> -m <module_name> -i <inventory_file>
+
+ansible testnodes -m ping
+
+ansible samplenode1 -m ping -i inventory1
+
+#host machines can be identified using :
+#all | group_name | individual_host_name
+
+
+###update vi /etc/ansible/host
+
+[testnodes]
+samplenode1 ansible_ssh_host=172.31.41.32 ansible_ssh_user=ansibleadmin
+samplenode2 ansible_ssh_host=172.31.39.17 ansible_ssh_user=ansibleadmin
+
+
+/etc/ansible/dev_inventory
+
+[devnodes]
+sampledevnode1 ansible_ssh_host=172.31.41.32 ansible_ssh_user=ansibleadmin
+sampledevnode2 ansible_ssh_host=172.31.39.17 ansible_ssh_user=ansibleadmin
+
+ansible devnodes -m ping -i /etc/ansible/dev_inventory
+
+
+Ansible
+
+    1  yum update -y
+    2  amazon-linux-extras install epel -y
+    3  hostname -i
+    4  amazon-linux-extras install ansible2 -y
+    5  ansible -v
+    6  ansible2 -v
+    7  ansible --version
+    8  sudo yum update -y
+    9  cd /etc/ansible/
+   10  ls
+   11  ls -ltr
+		ll
+   14  useradd -m -d /home/devopsadmin/ devopsadmin
+   15  su - devopsadmin
+   16  passwd devopsadmin
+   17  su - devopsadmin
+   18  chmod -R devopadmin:devopsadmin /etc/ansible/
+   19  chmod -R devopsadmin:devopsadmin /etc/ansible/
+   20  chown -R devopsadmin:devopsadmin /etc/ansible/
+   21  cd /etc/ansible/
+   22  ll
+   23  su - devopsadmin
+   
+   
+ /////////////////Ansible controller
+  ssh-keygen
+    2  ls -a
+    3  cd .ssh/
+    4  ls
+    5  ls -ltr
+    6  ll
+    7  ssh-copy-id ansibleadmin@172.31.15.110
+    8  ssh ansibleadmin@172.31.15.110
+    9  ssh-copy-id ansibleadmin@172.31.3.191
+   10  ssh ansibleadmin@172.31.3.191
+   11  sudo -i
+   12  exit
+   13  ll
+   14  cd /etc/ansible/
+   15  ll
+   16  cat ansible.cfg
+   17  cat hosts
+   18  cd roles/
+   19  ls
+   20  ll
+   21  cd .
+   cd /etc/ansible/
+   24  vi hosts
+   25  ansible testnodes -m ping
+   26  vi hosts
+   27  ansible testnodes -m ping
+   28  ansible samplenode1 -m ping
+   29  ansible samplenode2 -m ping
+   30  ansible samplenode2 -m ping >> file1.txt
+   31  sudo yum update -y
+   32  yum update -y
+   33  sudo yum update
+   34  ansible samplenode1 -m shell -a "sleep 5 ; echo 'hi'"
+   35  ansible samplenode1 -m shell -a "uptime"
+   36  ansible samplenode2 -m shell -a "uptime"
+   37  ansible samplenode1 -m shell -a "sleep 25 ; echo 'hi'"
+   38  ANSIBLE_KEEP_REMOTE_FILES=1 ansible samplenode1 -m shell -a "sleep 2 ; echo 'hi'"
+   39  ansible samplenode1 -m ping
+   40  ansible samplenode2 -m ping
+   41  ansible samplenode1 -m setup
+   42  ansible samplenode1 -m setup -a "filter=ansible_mounts"
+   43  touch file1.txt
+   44  ansible samplenode1 -m copy -a "src=/home/devopsadmin/file1.txt dest=/home/ansibleadmin"
+   45  echo "hello" >> file1.txt
+   46  ansible samplenode1 -m copy -a "src=/home/devopsadmin/file1.txt dest=/home/ansibleadmin"
+   47  echo "hi how are you?" >> file1.txt
+   48  ansible samplenode1 -m copy -a "src=/home/devopsadmin/file1.txt dest=/home/ansibleadmin" backup=yes
+   49  ansible samplenode1 -m copy -a "src=/home/devopsadmin/file1.txt dest=/home/ansibleadmin backup=yes"
+   50  ansible samplenode1 -m fetch -a "src=/home/ansibleadmin/file2.txt dest=/home/devopsadmin"
+   51  ls
+   52  cd samplenode1/
+   53  ls
+   54  cd home/
+   55  ls
+   56  cd ansibleadmin/
+   57  ls
+   58  cat file2.txt
+   59  ansible -doc -l
+   60  ansible -doc-l
+   61  ansible-doc-l
+   62  ansible-doc -l
+   63  ansible-doc -l | wc -l
+   64  ls
+   65  ansible testnodes -m ping
+   vi debug.yml
+   68  cat debug.yml
+   69  ls
+   70  vi debug.yml
+   71  cat debug.yml
+   72  ansible-playbook debug.yml
+   73  ansible-playbook debug.yml --syntax-check
+   74  vi datatype.yml
+   75  cat datatype.yml
+   76  ansible-playbook datatype.yml
+   77  vi var.yml
+   78  vi runtiimeinput.yml
+   79  pwd
+   80  ls
+   81  vi runtiimeinput.yml
+   82  ansible-playbook runtiimeinput.yml
+   83  vi runtiimeinput.yml
+   84  ansible-playbook runtiimeinput.yml
+   85  vi runtiimeinput.yml
+   86  ansible-playbook runtiimeinput.yml
+   87  vi var.yml
+   88  ansible-playbook runtiimeinput.yml
+   89  ansible-playbook var.yml --syntax-check
+   90  vi var.yml
+   91  ansible-playbook var.yml --syntax-check
+   92  vi var.yml
+   93  ansible-playbook var.yml --syntax-check
+   94  vi var.yml
+   95  ansible-playbook var.yml --syntax-check
+   96  vi var.yml
+   97  ansible-playbook var.yml --syntax-check
+   98  vi var.yml
+   99  ansible-playbook var.yml --syntax-check
+  100  vi var.yml
+  101  ansible-playbook var.yml --syntax-check
+  102  vi var.yml
+  103  ansible-playbook var.yml --syntax-check
+  104  vi var.yml
+  105  ansible-playbook var.yml --syntax-check
+  106  vi var.yml
+  107  ansible-playbook var.yml --syntax-check
+  108  vi var.yml
+  109  ansible-playbook var.yml --syntax-check
+  110  vi var.yml
+  111  ansible-playbook var.yml --syntax-check
+  112  cat var.yml
+  113  ansible-playbook var.yml --syntax-check
+  114  cat var.yml
+  115  vi var.yml
+  116  ansible-playbook var.yml --syntax-check
+  117  vi var.yml
+  118  ansible-playbook var.yml --syntax-check
+  119  vi var.yml
+  120  ansible-playbook var.yml --syntax-check
+  121  vi var.yml
+  122  ansible-playbook var.yml --syntax-check
+  123  vi var.yml
+  124  ansible-playbook var.yml --syntax-check
+  125  vi var.yml
+  126  ansible-playbook var.yml --syntax-check
+  127  cat var.yml
+  128  vi var.yml \
+  129  vi var.yml
+  130  ansible-playbook var.yml --syntax-check
+  131  vi var.yml
+  132  ansible-playbook var.yml --syntax-check
+  133  cd /etc/ansible/
+  134  ls
+  135  ll
+  136  vi var.yml
+  137  ansible-playbook var.yml --syntax-check
+  138  A
+  139  vi var.yml
+  140  A
+  141  ansible-playbook var.yml --syntax-check
+  142  vi var.yml
+  143  ansible-playbook var.yml --syntax-check
+  144  vi var.yml
+  145  ansible-playbook var.yml --syntax-check
+  146  vi var.yml
+  147  ansible-playbook var.yml --syntax-check
+  148  vi var.yml
+  149  ansible-playbook var.yml --syntax-check
+  150  vi var.yml
+  151  ansible-playbook var.yml --syntax-check
+  152  vi var.yml
+  153  ls
+  154  ansible-playbook testnodes -m ping
+  155  ansible testnodes -m ping
+  156  ls
+  157  vi var.yml
+  158  ansible-playbook var.yml --syntax-check
+  159  vi var.yml
+  160  ansible-playbook var.yml --syntax-check
+  161  vi var.yml
+  162  ansible-playbook var.yml --syntax-check
+  163  vi var.yml
+  164  ansible-playbook var.yml --syntax-check
+  165  vi var.yaml
+  166  cat var.yaml
+  167  ansible-playbook var.yaml --syntax-check
+  168  cat var.yaml
+  169  vi var.yaml
+  170  ansible-playbook var.yaml --syntax-check
+  171  ls
+  172  vi runtiimeinput.yml
+  173  ansible-playbook runtiimeinput.yml
+  174  ls
+  175  cd /etc/ansible/roles/
+  176  ls
+  177  ll
+  178  ls -ltr
+  179  vi git.yml
+  180  ansible-playbook git.yml --syntax-check
+  181  ansible-playbook git.yml
+  182  vi git.yml
+  183  ansible-playbook git.yml
+  184  vi git.yml
+  185  ansible-playbook git.yml
+  186  vi git.yml
+  187  ansible-playbook git.yml
+  188  vi input.yml
+  189  ansible-playbook input.yml --syntax-check
+  190  vi input.yml
+  191  ansible-playbook input.yml --syntax-check
+  192  vi input.yml
+  193  ansible-playbook input.yml --syntax-check
+  194  vi input.yml
+  195  ansible-playbook input.yml --syntax-check
+  196  vi input.yml
+  197  ansible-playbook input.yml --syntax-check
+  198  vi input.yml
+  199  ansible-playbook input.yml --syntax-check
+  200  vi input.yml
+  201  ansible-playbook input.yml --syntax-check
+  202  vi input.yml
+  203  ansible-playbook input.yml --syntax-check
+  204  vi input.yml
+  205  ansible-playbook input.yml
+  206  vi input.yml
+  207  ansible-playbook input.yml
+  208  ansible-playbook input.yml --syntax-check
+  209  ansible-playbook input.yml
+  210  vi input.yml
+  211  ansible-playbook input.yml
+  212  ansible-playbook input.yml --syntax-check
+  213  vi input.yml
+  214  ansible-playbook input.yml --syntax-check
+  215  vi input.yml
+  216  ansible-playbook input.yml -e "host_name=samplenode1 tool_name=git tool_state=present"
+  217  bash --version
+  218  vi shell.yml
+  219  ansible-playbook shell.yml
+  220  vi register.yml
+  221  ansible-playbook register.yml
+  222  vi setup.yml
+  223  ansible-playbook setup.yml
+  224  vi handler.yml
+  225  ansible-playbook handler.yml
+  226  cat handler.yml
+  227  vi handler2.yml
+  228  ansible-playbook handler2.yml
+  229  vi handler2.yml
+  230  ansible-playbook handler2.yml
+  231  vi handler2.yml
+  232  ansible-playbook handler2.yml
+  233  cat handler
+  234  cat handler2.yml
+  235  ansible-playbook handler2.yml
+  236  cat handler.yml
+  237  vi handler2.yml
+  238  ansible-playbook handler2.yml
+  239  cat handler2.yml
+  240  ansible-playbook handler2.yml
+  241  ansible testnodes -m ping
+  242  ansible samplenode1 -m shell "sleep 5" "echo hi"
+  243  ansible samplenode1 -m shell "sleep 5;" "echo 'hi'"
+  244  ansible samplenode1 -m shell "sleep 5 ; echo 'hi'"
+  245  ansible samplenode1 -m shell -a "sleep 5 ; echo 'hi'"
+  246  ansible samplenode -m uptime
+  247  ansible samplenode1 -m uptime
+  248  ansible samplenode1 -m shell -a "uptime"
+  249  ansible samplenode2 -m shell -a "uptime"
+  250  ansible samplenode2 -m setup
+  251  ansible samplenode2 -m ping
+  69  cd /etc/ansible/roles/
+  270  ls
+  271  ansible-galaxy init myrole
+  272  ls
+  273  cd myrole/
+  274  ll
+  275  ls -ltr
+  276  history
+  
+   ///
+   
+#**************************************************************************************************************************
+#Access thru Ansible Controller :
+#**************************************************************************************************************************
+Ansible Modules: Eg.: 
+ansible testnodes -m ping
+
+ansible all -m ping ### will ping all hosts from /etc/ansible/hosts file
+
+ansible samplenode1 -m ping
+ansible samplenode2 -m ping
+
+#or using user defined Inventory file
+#ansible ansible-node1 -m ping -i myinventoryfile.txt
+
+
+ansible samplenode1 -m ping -i myinventoryfile.txt
+
+#**************************************************************************************************************************
+
+ansible samplenode2 -m ping
+ANSIBLE_KEEP_REMOTE_FILES=1 ansible samplenode1 -m shell -a "sleep 5 ; echo 'hi'"
+
+ANSIBLE_KEEP_REMOTE_FILES=1 ansible samplenode1 -m shell -a "uptime"
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Ansible Facts!
+
+ansible samplenode1 -m setup
+ansible samplenode1 -m setup -a "filter=ansible_mounts"
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+##Transfer a file from Ansible Controller to Nodes using copy Module
+
+ansible samplenode1 -m copy -a "src=/etc/ansible/file1.txt dest=/home/ansibleadmin"
+ansible samplenode1 -m copy -a "src=/etc/ansible/s1.txt dest=/home/ansibleadmin backup=yes"
+
+##Transfer a file from Ansible Nodes to Ansible Controller using fetch Module
+ansible samplenode1 -m fetch -a "src=/home/ansibleadmin/filefromAN1.txt dest=/home/devopsadmin"
+
+UseCase 1 :
+	- Deploy an artifact *.war from Jenkins Slave Machine to QA-Server.
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+### List all modules:
+ansible-doc -l
+### No. of modules:
+ansible-doc -l | wc -l
+### Search for specific modules:
+ansible-doc -l | grep shel
+### To know about any specific modules:
+ansible-doc shell
+
+#**************************************************************************************************************************
+#Ansible Variables !
+#shell : echo $var1 
+
+#debugmod.yaml
+
+---
+ - hosts: testnodes
+   tasks:
+   - debug:  
+      msg:
+       - "The os distribution is: {{ansible_distribution}}" 
+       - "THe os name is: {{ansible_system}}"
+       - "The os family is: {{ansible_os_family}}"
+       - "THe mount points are :{{ansible_mounts}}"
+    
+ansible-playbook testfile.yaml
+
+# How to jus verify playbook syntax:
+#ansible-playbook testfile.yaml --syntax-check
+
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#~~~~~~~~~~~~~~~~~~~~~~~~~ test_var-datatype.yaml
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#test_var-datatype.yaml
+---
+ - hosts: samplenode1
+   vars:
+    x: 23
+    my_num: 45.67
+    my_name: Loksai
+    my_b: YES   
+   tasks:
+   - debug:
+      msg:
+       - "The value of x is: {{x}} and type: {{x|type_debug}}"
+       - "THe value of my_num: {{my_num}} and type : {{my_num|type_debug}}"
+       - "The value of my_name : {{my_name}} and type: {{my_name|type_debug}}"
+       - "THe value of my_b is: {{my_b}} and type : {{my_b|type_debug}}"
+
+
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#/etc/ansible/variables/myvarfile1.yaml
+    x: 23
+    my_num: 45.67
+    my_name: Loksai_ETA
+    my_b: YES
+
+#test_var-datatype1.yaml
+---
+ - hosts: samplenode1
+   vars_files:
+     - /etc/ansible/variables/myvarfile1.yaml
+   tasks:
+   - debug:
+      msg:
+       - "The value of x is: {{x}} and type: {{x|type_debug}}"
+       - "THe value of my_num: {{my_num}} and type : {{my_num|type_debug}}"
+       - "The value of my_name : {{my_name}} and type: {{my_name|type_debug}}"
+       - "THe value of my_b is: {{my_b}} and type : {{my_b|type_debug}}"
+
+ansible-playbook test_var-datatype1.yaml
+
+
+---
+ - hosts: samplenode1
+   gather_facts: false
+   become: yes
+   tasks:
+   - name: Manage git tool
+     yum:
+       name: git
+       state: present
+
+
+yum/apt ::
+
+state : present / absent / latest 
+
+yum install git 
+yum remove git 
+yum update git 
+
+
+#manage_pkg.yaml
+---
+ - hosts: "{{ host_name }}"
+   become: yes
+   tasks:
+   - name: Manage "{{ tool_name }}" service
+     yum:
+       name: "{{ tool_name }}"
+       state: "{{ tool_state }}"
+
+
+
+
+ansible-playbook manage_pkg.yaml -e "host_name=samplenode1 tool_name=git tool_state=present"
+
+
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#~~~~~~~~~~~~~~~~~~~~~~~~~ register and set-facts
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+#test_var-datatype.yaml
+---
+ - hosts: samplenode1
+   gather_facts: false
+   tasks:
+   - shell: "bash --version"
+
+
+
+
+
+
+#test_var-datatype.yaml
+---
+ - hosts: samplenode1
+   tasks:
+   - shell: "bash --version"
+     register: bash_ver
+   - debug: var=bash_ver
+   
+
+a = 5 
+b = 5 
+
+c = a + b 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   
+#register_set_facts.yaml
+---
+ - hosts: samplenode1
+   tasks:
+   - shell: "bash --version"
+     register: bash_ver
+   - set_fact:
+      bash_version: "{{bash_ver.stdout.split('\n')[0].split()[3]}}"
+      my_value: "bash version"
+   - debug: var=bash_version
+   
+
+
+
+Handlers :::
+
+
+---
+  - hosts: samplenode1
+    #gather_facts: false
+    become: yes
+    tasks:
+      - name: Install httpd
+        yum:
+          name: httpd
+          state: present
+        notify:
+        - start httpd
+    handlers:
+    - name: start httpd
+      service:
+          name: httpd
+		  State: Started
+	- name: stop httpd
+	  service:
+	      name: httpd
+		  state: stopped
+          state: started
+
+---
+  - hosts: samplenode1
+    #gather_facts: false
+    become: yes
+    tasks:
+      - name: Install httpd
+        yum:
+          name: httpd
+          state: present
+        notify:
+        - stop httpd
+    handlers:
+    - name: start httpd
+      service:
+          name: httpd
+          state: started
+	- name: stop httpd
+      service:
+          name: httpd
+          state: stopped
+
+Handlers --> are used to controll the flow of playbook execution, based on the previous modules
+		This can be done thru notify key.
+
+		Handlers are same as tasks.
+	
+
+
+Loops :
+
+
+
+
+
+
+---
+  - hosts: samplenode1
+    become: yes
+    tasks:
+      - yum:
+         name: git
+         state: present
+      - yum:
+         name: httpd
+         state: present
+      - yum:
+         name: vim
+         state: present
+
+
+
+
+
+
+
+
+
+
+
+Loops :::
+
+
+
+
+
+
+
+
+---
+  - hosts: samplenode1
+    gather_facts: false
+    become: yes
+    tasks:
+      - yum:
+         name: "{{item}}"
+         state: absent
+        loop:
+          - git
+          - httpd
+          - vim
+  
+
+
+
+ 
+#~~~~~~~~~~~~~~~~~~~~~~~~~
+Ansible Roles :::
+
+
+		Ansible Roles are used to organize the Ansible Components
+		To reuse & Share.
+
+		Ansible Repository ::
+
+		Understand the structure of Ansible Components ::::
+
+			playbooks, handlers, loop, variable, defaults, tasks,
+
+ 
+ 
+ tasks are nothing but collection of modules which are going to perform the tasks.
+ debug used to print output message in the console
+		it has 2 arguments
+		msg and var 
+		var should be within 2 curly braces.
+		ginga to tempalate
